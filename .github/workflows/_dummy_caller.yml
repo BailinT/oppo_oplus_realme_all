@@ -1,9 +1,0 @@
-# 测试用: 跨 ref 调用 caller（验证后删除）
-name: "DUMMY-CALLER (test only)"
-on:
-  workflow_dispatch:
-jobs:
-  t:
-    uses: BailinT/oppo_oplus_realme_all/.github/workflows/_dummy_mod.yml@_modtest
-    with:
-      tag: hello-from-main
