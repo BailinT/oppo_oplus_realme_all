@@ -52,6 +52,9 @@ OPPO/一加/真我 GKI 内核自动化编译（照 cctv18 三仓的 fastbuild �
 
 ## 编译方式
 
+- **入口**：Actions 列表只有 5 个线级入口「内核构建 - Linux 5.10/5.15/6.1/6.6/6.12」，一键构建该线全部子版本；`only_sub_level` 填版本号（如 226）可只建单个。每个子版本独立出 AK3 包、独立 Release。
+- **模块位置（重要）**：35 个单版本构建文件是 `workflow_call` 可复用模块，放在 **`modules` 分支**的 `.github/workflows/`（放在默认分支会占据 Actions 列表）。线级入口通过 `uses: BailinT/oppo_oplus_realme_all/.github/workflows/<file>.yml@modules` 跨分支调用。
+- **改动模块的流程**：切到 `modules` 分支改 → push → 线级入口立即生效（无需重建 main）。改完先在一条线跑 `only_sub_level=<单版本>` 验证。
 - 源码：OnePlusOSS 官方 common 仓 + cctv18 三仓（6.x 用 cctv18 预修版）
 - 死链修复：官方 common 仓的 `drivers/soc/oplus/storage` 等是指向未开源 vendor 的死链，workflow 内自动替换
 - SUSFS：ShirkNeko/susfs4ksu（5.x）/ cctv18/susfs4oki（6.x）
