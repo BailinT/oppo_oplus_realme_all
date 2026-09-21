@@ -50,6 +50,12 @@ OPPO/一加/真我 GKI 内核自动化编译（照 cctv18 三仓的 fastbuild �
 
 速览：5.x 源码来自 OnePlusOSS 官方仓；6.x 来自 cctv18 三仓（sm8650/sm8750/sm8850）的预修版；SUSFS/KPN 等外部依赖动态拉取。
 
+## 构建入口（Actions 列表 8 个）
+
+- **5 个内核构建线**：`内核构建 - Linux 5.10/5.15/6.1/6.6/6.12`，一次 dispatch 建整线；`only_sub_level` 填子版本号 = 只建该版本
+- **3 个仓库维护工具**：`发布测试`（造测试包验证 release 流程）/ `清理仓库工作流`（清 Actions 历史）/ `清理全部ccache缓存`（需输入 DELETE 确认）
+- 36 个子版本模块（fastbuild_*.yml）在 `modules` 分支，由线级入口跨分支调用，不占 Actions 列表
+
 ## 编译方式
 
 - 源码：OnePlusOSS 官方 common 仓 + cctv18 三仓（6.x 用 cctv18 预修版）
