@@ -66,6 +66,11 @@ on:
         required: true
         type: boolean
         default: true
+      use_nomount:
+        description: '是否启用NoMount挂载元模块(内核VFS层无挂载注入,不产生真实mount,对抗statfs/mountinfo类环境检测;需配合设备端NoMount管理器使用;默认关闭)'
+        required: true
+        type: boolean
+        default: false
       ccache_update:
         description: '更新ccache缓存(将本次编译生成的ccache缓存覆盖至仓库缓存，在更改编译配置、源码或需要刷新缓存时开启)'
         required: true
@@ -373,7 +378,25 @@ jobs:
           cd common
           wget https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/other_patch/cve-2026-43499-rtmutex-6.1.patch
           patch -p1 -F 3 < cve-2026-43499-rtmutex-6.1.patch
-          
+
+      - name: 集成 NoMount 挂载元模块
+        if: inputs.use_nomount
+        run: |
+          cd kernel_workspace
+          # NoMount(maxsteeel/nomount): 内核VFS层无挂载注入, 不产生真实mount, 消除statfs/mountinfo类挂载痕迹; 与SUSFS sus_mount互补共存
+          # 固定 commit 016375cd(dev头, 含09-12内核兼容修复), setup.sh 与 checkout 目标同源pin死, 防漂移
+          curl -fsSL --retry 5 --retry-delay 5 --retry-all-errors \
+            https://raw.githubusercontent.com/maxsteeel/nomount/016375cd/kernel/setup.sh | bash -s 016375cd
+          if [ ! -e ./common/fs/nomount ]; then
+            echo "::error::NoMount 集成失败: common/fs/nomount 软链缺失"
+            exit 1
+          fi
+          grep -q "nomount" ./common/fs/Makefile || { echo "::error::fs/Makefile 未注册 nomount"; exit 1; }
+          grep -q 'source "fs/nomount/Kconfig"' ./common/fs/Kconfig || { echo "::error::fs/Kconfig 未挂接 nomount"; exit 1; }
+          echo "CONFIG_NOMOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
+          grep -q "^CONFIG_NOMOUNT=y" ./common/arch/arm64/configs/gki_defconfig || { echo "::error::CONFIG_NOMOUNT 写入失败"; exit 1; }
+          echo "NoMount 集成完成: $(git -C NoMount rev-parse --short HEAD)"
+
       - name: 启用网络功能增强优化配置
         if: inputs.better_net
         run: |
