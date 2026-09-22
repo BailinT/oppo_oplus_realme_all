@@ -88,6 +88,11 @@ on:
         required: true
         type: boolean
         default: true
+      use_nomount:
+        description: "是否启用NoMount挂载元模块(试点: 当前仅6.1.141支持; 内核VFS层无挂载注入,对抗statfs/mountinfo类检测;默认关闭)"
+        required: true
+        type: boolean
+        default: false
       ccache_update:
         description: "更新ccache缓存(将本次编译生成的ccache缓存覆盖至仓库缓存，在更改编译配置、源码或需要刷新缓存时开启)"
         required: true
@@ -263,6 +268,7 @@ jobs:
         ssg_enable: ${{ inputs.ssg_enable }}
         rekernel_enable: ${{ inputs.rekernel_enable }}
         baseband_guard: ${{ inputs.baseband_guard }}
+        use_nomount: ${{ inputs.use_nomount }}
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
