@@ -5,7 +5,7 @@
  	$(call if_changed,gzip)
  
 -filechk_cat = cat $<
-+filechk_cat = grep -vE 'CONFIG_KSU|CONFIG_SUSFS|CONFIG_NOMOUNT' $<
++filechk_cat = grep -vE 'CONFIG_KSU|KernelSU|SUSFS|NOMOUNT' $<
  
  $(obj)/config_data: $(KCONFIG_CONFIG) FORCE
  	$(call filechk,cat)
