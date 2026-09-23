@@ -374,9 +374,6 @@ jobs:
           sed -i 's/check_defconfig//' ./common/build.config.gki
           #跳过将uapi标准头安装到 usr/include 目录的不必要操作，节省编译时间
           echo "CONFIG_HEADERS_INSTALL=n" >> ./common/arch/arm64/configs/gki_defconfig
-          #关闭内核配置导出: /proc/config.gz 全用户可读, 会暴露 CONFIG_KSU/SUSFS/NOMOUNT 等编译配置(2026-09-23 防泄露)
-          echo "CONFIG_IKCONFIG=n" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_IKCONFIG_PROC=n" >> ./common/arch/arm64/configs/gki_defconfig
           # 应用 CVE_2026_43499 修复补丁
           cd common
           wget https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/other_patch/cve-2026-43499-rtmutex-6.1.patch
