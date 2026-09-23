@@ -378,6 +378,9 @@ jobs:
           cd common
           wget https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/other_patch/cve-2026-43499-rtmutex-6.1.patch
           patch -p1 -F 3 < cve-2026-43499-rtmutex-6.1.patch
+          # IKCONFIG 内容脱敏: /proc/config.gz 嵌入配置过滤 CONFIG_KSU/SUSFS/NOMOUNT 行(2026-09-24 防泄露; 文件与权限不动, vendor 读取不受影响)
+          wget https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/other_patch/ikconfig_sanitize-6.1.patch
+          patch -p1 -F 3 < ikconfig_sanitize-6.1.patch
 
       - name: 集成 NoMount 挂载元模块
         if: inputs.use_nomount
