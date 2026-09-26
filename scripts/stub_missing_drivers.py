@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
-# 通用清障 v2: 扫描 obj-$(CONFIG_X) += dir/ 引用的缺失/残缺驱动目录, 一律建空 Makefile stub
-# 不依赖 .config 状态(多余 stub 无害); 处理悬空符号链接; 带诊断输出
+# 通用清障 v3: 扫描 obj-$(CONFIG_X) += dir/ 引用的缺失/残缺驱动目录, 一律建空 Makefile stub
+# CWD 自适应: 从当前目录或 ./common 定位内核树; 处理悬空符号链接; 带诊断输出
 import os, re
+
+root = './common' if os.path.isdir('./common/drivers') else '.'
+print('CWD:', os.getcwd(), '| 内核树基准:', root)
 
 pat = re.compile(r'obj-(?:\$\(CONFIG_[A-Za-z0-9_]+\)|[ym])[ \t]*\+?=[ \t]*([A-Za-z0-9_./-]+)/')
 stubbed, walked, hits = 0, 0, 0
 for top in ('drivers', 'sound', 'techpack'):
-    base = os.path.join('./common', top)
+    base = os.path.join(root, top)
     if not os.path.isdir(base):
         continue
     for dirpath, dirs, files in os.walk(base):
