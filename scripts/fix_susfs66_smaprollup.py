@@ -7,8 +7,6 @@ p = root + 'fs/proc/task_mmu.c'
 if not os.path.exists(p):
     print('skip: task_mmu.c not found at', p); raise SystemExit
 src = open(p, encoding='utf-8', errors='ignore').read()
-if 'CONFIG_KSU_SUSFS_SUS_MAP' in src:
-    print('SUS_MAP wrapper already present, skip'); raise SystemExit
 pat = re.compile(r'(/\* Case 4 above \*/\n(\t+)if \(vma->vm_end > last_vma_end\) \{\n)(\t+smap_gather_stats\(vma, &mss, last_vma_end\);\n\t+last_vma_end = vma->vm_end;\n)(\t+\})')
 m = pat.search(src)
 if not m:
