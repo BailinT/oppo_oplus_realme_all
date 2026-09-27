@@ -286,6 +286,7 @@ jobs:
             cp ./susfs4ksu/kernel_patches/include/linux/* ./common/include/linux/
             cd ./common
             patch -p1 -F 3 < 50_add_susfs_in_gki-${{ env.ANDROID_VERSION }}-${{ env.KERNEL_VERSION }}.patch || true
+          wget -qO /tmp/fix_smaprollup.py https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/scripts/fix_susfs66_smaprollup.py && python3 /tmp/fix_smaprollup.py
             patch -p1 -N -F 3 < 69_hide_stuff.patch || true
             cd ..
           else
