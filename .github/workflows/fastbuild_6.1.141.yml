@@ -718,7 +718,12 @@ jobs:
             wget https://raw.githubusercontent.com/$GITHUB_REPOSITORY/refs/heads/$GITHUB_REF_NAME/zram.zip
           fi
           if [[ ${{ inputs.kpm_enable }} == 'true' ]]; then
-            wget https://github.com/cctv18/KPatch-Next/releases/latest/download/kpn.zip
+            wget -q --tries 3 --timeout 60 -O kpn.zip https://github.com/cctv18/KPatch-Next/releases/latest/download/kpn.zip || { echo "::error::kpn.zip 下载失败"; exit 1; }
+            echo "已内置 kpn.zip（KPatch Next 独立 KPM 模块）"
+          fi
+          if [[ ${{ inputs.use_nomount }} == 'true' ]]; then
+            wget -q --tries 3 --timeout 60 -O nomount.zip https://raw.githubusercontent.com/$GITHUB_REPOSITORY/refs/heads/$GITHUB_REF_NAME/NoMount-429-016375c.zip || { echo "::error::nomount.zip 下载失败"; exit 1; }
+            echo "已内置 nomount.zip（NoMount 挂载元模块 429 版，与内核侧 016375cd 配对）"
           fi
           if [[ -n "${{ inputs.kernel_suffix }}" ]]; then
             AK3_NAME=AnyKernel3_${KSU_TYPENAME}_${{ env.KSUVER }}_${{ env.KERNEL_VERSION }}_${{ inputs.kernel_suffix }}.zip
