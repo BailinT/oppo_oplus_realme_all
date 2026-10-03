@@ -118,13 +118,13 @@ jobs:
           echo "正在克隆源码仓库..."
           aria2c -s16 -x16 -k1M https://github.com/OnePlusOSS/android_kernel_oneplus_sm8475/archive/refs/heads/oneplus/sm8475_s_12.1_oneplus_10t_5g.zip -o common.zip && 
           unzip -q common.zip && 
-          mv "android_kernel_oneplus_sm8475-oneplus-sm8475_s_12.1_oneplus_10t_5g" common &&
+          mv "android_kernel_oneplus_sm8475-oneplus-sm8475_t_13.0.0_ace_pro" common &&
           rm -rf common.zip &
           
           echo "正在克隆设备树仓库(用于修复官方common仓的死链)..."
           aria2c -s16 -x16 -k1M https://github.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8475/archive/refs/heads/oneplus/sm8475_s_12.1_oneplus_10t_5g.zip -o devicetree.zip &&
           unzip -q devicetree.zip &&
-          mv "android_kernel_modules_and_devicetree_oneplus_sm8475-oneplus-sm8475_s_12.1_oneplus_10t_5g" devicetree &&
+          mv "android_kernel_modules_and_devicetree_oneplus_sm8475-oneplus-sm8475_t_13.0.0_ace_pro" devicetree &&
           rm -rf devicetree.zip &
           
           echo "正在克隆llvm-Clang20工具链..." &&
@@ -335,14 +335,21 @@ jobs:
                 if grep -q 'kvzalloc' drivers/thermal/thermal_sysfs.c && ! grep -q '#include <linux/mm.h>' drivers/thermal/thermal_sysfs.c; then
                   sed -i '/#include <linux\/slab.h>/a #include <linux\/mm.h>' drivers/thermal/thermal_sysfs.c
                   grep -q '#include <linux/mm.h>' drivers/thermal/thermal_sysfs.c || { echo '::error::thermal_sysfs mm.h 补丁失败'; exit 1; }
-                fi
+                    # OEM 同步失误: ace 系树 mm/vmscan.c 缺 bool scan_adjusted 声明(11r 树有) -> 脚本条件补
+                    if grep -q 'scan_adjusted' mm/vmscan.c && ! grep -q 'bool scan_adjusted;' mm/vmscan.c; then
+                      wget -qO /tmp/fix_vmscan.py "https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/scripts/fix_vmscan_scan_adjusted.py?nocache=$(date +%s)"
+                      python3 /tmp/fix_vmscan.py
+                      grep -q 'bool scan_adjusted;' mm/vmscan.c || { echo '::error::vmscan scan_adjusted 声明补丁失败'; exit 1; }
+                    fi
+              # OEM 同步失误: ace 系树 mm/vmscan.c 缺 bool scan_adjusted 声明(11r 树有) -> 条件补
+              fi
 
               # 补源的 sensor devinfo 依赖私有符号(qcom_smem/get_project, 原厂在 vendor 侧) -> 关闭编入
               if [ -d drivers/soc/oplus/sensor ]; then
                 grep -q "CONFIG_OPLUS_FEATURE_SENSOR_CFG" arch/arm64/configs/gki_defconfig || echo "# CONFIG_OPLUS_FEATURE_SENSOR_CFG is not set" >> arch/arm64/configs/gki_defconfig
                 echo "已关闭 OPLUS_FEATURE_SENSOR_CFG(sensor devinfo 依赖 vendor 私有符号)"
               fi
-              fi
+            fi
             cd ..
           else
             echo "已选择无内置KernelSU模式，跳过susfs配置..."

@@ -118,13 +118,13 @@ jobs:
           echo "正在克隆源码仓库..."
           aria2c -s16 -x16 -k1M https://github.com/OnePlusOSS/android_kernel_oneplus_sm8475/archive/refs/heads/oneplus_sm8475_t_13.0_oneplus_11R_5G.zip -o common.zip && 
           unzip -q common.zip && 
-          mv "android_kernel_oneplus_sm8475-oneplus_sm8475_t_13.0_oneplus_11R_5G" common &&
+          mv "android_kernel_oneplus_sm8475-oneplus-sm8475_t_13.0.0_ace_pro" common &&
           rm -rf common.zip &
           
           echo "正在克隆设备树仓库(用于修复官方common仓的死链)..."
           aria2c -s16 -x16 -k1M https://github.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8475/archive/refs/heads/oneplus_sm8475_t_13.0_oneplus_11R_5G.zip -o devicetree.zip &&
           unzip -q devicetree.zip &&
-          mv "android_kernel_modules_and_devicetree_oneplus_sm8475-oneplus_sm8475_t_13.0_oneplus_11R_5G" devicetree &&
+          mv "android_kernel_modules_and_devicetree_oneplus_sm8475-oneplus-sm8475_t_13.0.0_ace_pro" devicetree &&
           rm -rf devicetree.zip &
           
           echo "正在克隆llvm-Clang20工具链..." &&
@@ -155,7 +155,7 @@ jobs:
           else
             echo "devicetree 仓无 cpu 替换源, 跳过"
           fi
-          # 通用 vendor 死链修复(11R 老世代单仓): 遍历补源, vendor 硬依赖缺失即失败
+          # 通用 vendor 死链修复(单仓 12.1/13.x 老世代 67 处链接): 遍历补源, 留死链即失败
           wget -qO /tmp/fix_vendor_symlinks.py "https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/scripts/fix_vendor_symlinks.py?nocache=$(date +%s)"
           python3 /tmp/fix_vendor_symlinks.py --tree common --modules devicetree
           # 修复 ABI 符号列表死链(build.config.gki.aarch64 的 ADDITIONAL_KMI_SYMBOL_LISTS 引用)
@@ -335,7 +335,14 @@ jobs:
                 if grep -q 'kvzalloc' drivers/thermal/thermal_sysfs.c && ! grep -q '#include <linux/mm.h>' drivers/thermal/thermal_sysfs.c; then
                   sed -i '/#include <linux\/slab.h>/a #include <linux\/mm.h>' drivers/thermal/thermal_sysfs.c
                   grep -q '#include <linux/mm.h>' drivers/thermal/thermal_sysfs.c || { echo '::error::thermal_sysfs mm.h 补丁失败'; exit 1; }
-                fi
+                    # OEM 同步失误: ace 系树 mm/vmscan.c 缺 bool scan_adjusted 声明(11r 树有) -> 脚本条件补
+                    if grep -q 'scan_adjusted' mm/vmscan.c && ! grep -q 'bool scan_adjusted;' mm/vmscan.c; then
+                      wget -qO /tmp/fix_vmscan.py "https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/scripts/fix_vmscan_scan_adjusted.py?nocache=$(date +%s)"
+                      python3 /tmp/fix_vmscan.py
+                      grep -q 'bool scan_adjusted;' mm/vmscan.c || { echo '::error::vmscan scan_adjusted 声明补丁失败'; exit 1; }
+                    fi
+              # OEM 同步失误: ace 系树 mm/vmscan.c 缺 bool scan_adjusted 声明(11r 树有) -> 条件补
+              fi
 
               # 补源的 sensor devinfo 依赖私有符号(qcom_smem/get_project, 原厂在 vendor 侧) -> 关闭编入
               if [ -d drivers/soc/oplus/sensor ]; then
