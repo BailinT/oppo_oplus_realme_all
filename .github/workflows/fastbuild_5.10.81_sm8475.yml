@@ -331,7 +331,6 @@ jobs:
                   grep -q '#include <linux/mm.h>' drivers/thermal/thermal_sysfs.c || { echo '::error::thermal_sysfs mm.h 补丁失败'; exit 1; }
                 fi
               fi
-                fi
             fi
             cd ..
           else
