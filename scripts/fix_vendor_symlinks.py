@@ -38,6 +38,11 @@ def main():
                     if pass_no == 1:
                         ok_links += 1
                     continue
+                if p.replace(os.sep, '/').startswith('Documentation/'):
+                    if pass_no == 1:
+                        internal_skip += 1
+                        print(f'  [skip-doc] {p.replace(os.sep, "/")} -> {tgt} (Documentation 树装饰)')
+                    continue
                 if 'vendor/' in tgt:
                     rel = tgt[tgt.index('vendor/'):].rstrip('/')
                     src = os.path.join(modules, rel)
