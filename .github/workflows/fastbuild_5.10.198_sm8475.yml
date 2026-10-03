@@ -318,6 +318,11 @@ jobs:
               python3 /tmp/fix_inotify.py --header fs/notify/inotify/inotify.h
               grep -q "inotify_mark_user_mask" fs/notify/inotify/inotify.h || { echo "::error::inotify_mark_user_mask 移植失败"; exit 1; }
             fi
+            # OEM 调试残渣: thermal_core.c 把 int 成员传给 dev_err(&tz->temperature)(clang12 不报, clang20 -Werror 报) -> 删该行
+            if grep -q 'dev_err(&tz->temperature' drivers/thermal/thermal_core.c; then
+              sed -i '/dev_err(&tz->temperature/ {N;N;d}' drivers/thermal/thermal_core.c
+              grep -q 'dev_err(&tz->temperature' drivers/thermal/thermal_core.c && { echo "::error::thermal_core 调试残渣清理失败"; exit 1; } || echo "已清理 thermal_core 调试残渣"
+            fi
             cd ..
           else
             echo "已选择无内置KernelSU模式，跳过susfs配置..."
