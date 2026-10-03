@@ -116,9 +116,9 @@ jobs:
           rm -f ./ccache &
           
           echo "正在克隆源码仓库..."
-          aria2c -s16 -x16 -k1M https://github.com/OnePlusOSS/android_kernel_common_oneplus_sm8475/archive/refs/heads/oneplus/sm8475_u_14.0.0_oneplus_ace_2.zip -o common.zip && 
+          aria2c -s16 -x16 -k1M https://github.com/OnePlusOSS/android_kernel_oneplus_sm8475/archive/refs/heads/oneplus/sm8475_u_14.0.0_oneplus_ace_2.zip -o common.zip && 
           unzip -q common.zip && 
-          mv "android_kernel_common_oneplus_sm8475-oneplus-sm8475_u_14.0.0_oneplus_ace_2" common &&
+          mv "android_kernel_oneplus_sm8475-oneplus-sm8475_u_14.0.0_oneplus_ace_2" common &&
           rm -rf common.zip &
           
           echo "正在克隆设备树仓库(用于修复官方common仓的死链)..."
@@ -155,6 +155,9 @@ jobs:
           else
             echo "devicetree 仓无 cpu 替换源, 跳过"
           fi
+          # 通用 vendor 死链修复(14.0 末代单仓): 遍历补源, vendor 硬依赖缺失即失败
+          wget -qO /tmp/fix_vendor_symlinks.py "https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/scripts/fix_vendor_symlinks.py?nocache=$(date +%s)"
+          python3 /tmp/fix_vendor_symlinks.py --tree common --modules devicetree
           # 修复 ABI 符号列表死链(build.config.gki.aarch64 的 ADDITIONAL_KMI_SYMBOL_LISTS 引用)
           curl -sL --max-time 30 "https://raw.githubusercontent.com/oppo-source/android_kernel_common_oppo_sm8475/oppo/sm8475_v_15.0.0_find_n2/android/abi_gki_aarch64_oplus_internal" -o common/android/abi_gki_aarch64_oplus_internal || true
           # 清理源码里的残留死链软链(build.config.msm.* 指向 msm-kernel 仓, gki_defconfig 编译不需要; 断链文件留着不碍事, 但删除以防 Kbuild 扫描)
