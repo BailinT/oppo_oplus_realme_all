@@ -312,6 +312,12 @@ jobs:
               sed -i 's|end = VMA_PAD_START(vma);|end = vma->vm_end;|' fs/proc/task_mmu.c
               echo "已修复 task_mmu.c 的 VMA_PAD_START(改用 vma->vm_end)"
             fi
+            # 老基树补 inotify_mark_user_mask(susfs fdinfo hunk 依赖; 新代际树自带) -> 移植 static inline
+            if grep -q "inotify_mark_user_mask" fs/notify/fdinfo.c && ! grep -q "inotify_mark_user_mask" fs/notify/inotify/inotify.h; then
+              wget -qO /tmp/fix_inotify.py "https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/scripts/fix_inotify_user_mask.py?nocache=$(date +%s)"
+              python3 /tmp/fix_inotify.py --header fs/notify/inotify/inotify.h
+              grep -q "inotify_mark_user_mask" fs/notify/inotify/inotify.h || { echo "::error::inotify_mark_user_mask 移植失败"; exit 1; }
+            fi
             cd ..
           else
             echo "已选择无内置KernelSU模式，跳过susfs配置..."
