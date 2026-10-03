@@ -118,13 +118,13 @@ jobs:
           echo "正在克隆源码仓库..."
           aria2c -s16 -x16 -k1M https://github.com/OnePlusOSS/android_kernel_oneplus_sm8475/archive/refs/heads/oneplus/sm8475_s_12.1_oneplus_10t_5g.zip -o common.zip && 
           unzip -q common.zip && 
-          mv "android_kernel_oneplus_sm8475-oneplus-sm8475_s_12.1_oneplus_10t_5g" common &&
+          mv "android_kernel_oneplus_sm8475-oneplus-sm8475_t_13.0.0_ace_pro" common &&
           rm -rf common.zip &
           
           echo "正在克隆设备树仓库(用于修复官方common仓的死链)..."
           aria2c -s16 -x16 -k1M https://github.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8475/archive/refs/heads/oneplus/sm8475_s_12.1_oneplus_10t_5g.zip -o devicetree.zip &&
           unzip -q devicetree.zip &&
-          mv "android_kernel_modules_and_devicetree_oneplus_sm8475-oneplus-sm8475_s_12.1_oneplus_10t_5g" devicetree &&
+          mv "android_kernel_modules_and_devicetree_oneplus_sm8475-oneplus-sm8475_t_13.0.0_ace_pro" devicetree &&
           rm -rf devicetree.zip &
           
           echo "正在克隆llvm-Clang20工具链..." &&
@@ -323,10 +323,7 @@ jobs:
             fi
             # OEM 调试残渣: thermal_core.c 把 int 成员传给 dev_err(&tz->temperature)(clang12 不报, clang20 -Werror 报) -> 删该行
             if grep -q 'dev_err(&tz->temperature' drivers/thermal/thermal_core.c; then
-              sed -i '/dev_err(&tz->temperature/ {N;N;d}' drivers/thermal/thermal_core.c              # 同文件 kvzalloc/kvfree 无声明(缺 mm.h include, clang12 传递包含/clang20 严格) -> 补
-              grep -q '#include <linux/mm.h>' drivers/thermal/thermal_sysfs.c || sed -i 's|#include <linux/slab.h>|#include <linux/slab.h>
-#include <linux/mm.h>|' drivers/thermal/thermal_sysfs.c
-
+              sed -i '/dev_err(&tz->temperature/ {N;N;d}' drivers/thermal/thermal_core.c
               grep -q 'dev_err(&tz->temperature' drivers/thermal/thermal_core.c && { echo "::error::thermal_core 调试残渣清理失败"; exit 1; } || echo "已清理 thermal_core 调试残渣"
             fi
             cd ..
