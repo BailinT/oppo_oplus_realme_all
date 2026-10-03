@@ -47,6 +47,9 @@ def main():
                     shutil.copyfile(src, p)
                     fixed.append(rel)
                     continue
+            if p.replace(os.sep, '/').startswith('Documentation/'):
+                print(f'  [skip-doc] {p} -> {tgt} (Documentation 树装饰, 构建不依赖)')
+                continue
             unresolved.append((p, tgt))
     print(f'自洽链接: {ok_links} | 已补源: {len(fixed)} | 仍死链: {len(unresolved)}')
     for rel in fixed:
