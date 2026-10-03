@@ -4,7 +4,7 @@
 # only_sub_level 留空 = 全部; 填子版本号 = 只建该版本
 # 每个子版本独立出 AK3 包、独立 release, 与原单版本构建行为一致
 # ============================================================
-name: "内核构建 - Linux 5.10（13 个子版本: 66/110/110_mtk6983/149/149_mtk6983/168/168_mtk6983/198/209/209_mtk/226/236/236_mtk）"
+name: "内核构建 - Linux 5.10（14 个子版本: 66/110/110_mtk6983/149/149_mtk6983/168/168_mtk6983/198/209/209_mtk/226/226_mtk6983/236/236_mtk）"
 
 permissions:
   contents: write
@@ -354,6 +354,26 @@ jobs:
     needs: guard
     if: ${{ inputs.only_sub_level == '' || inputs.only_sub_level == '168_mtk6983' }}
     uses: BailinT/oppo_oplus_realme_all/.github/workflows/fastbuild_5.10.168_mtk6983.yml@modules
+    with:
+        ksu_type: ${{ inputs.ksu_type }}
+        susfs_enable: ${{ inputs.susfs_enable }}
+        kpm_enable: ${{ inputs.kpm_enable }}
+        lz4_enable: ${{ inputs.lz4_enable }}
+        lz4kd_enable: ${{ inputs.lz4kd_enable }}
+        bbr_enable: ${{ inputs.bbr_enable }}
+        better_net: ${{ inputs.better_net }}
+        ssg_enable: ${{ inputs.ssg_enable }}
+        rekernel_enable: ${{ inputs.rekernel_enable }}
+        baseband_guard: ${{ inputs.baseband_guard }}
+        ccache_update: ${{ inputs.ccache_update }}
+        ccache_debug: ${{ inputs.ccache_debug }}
+        kernel_suffix: ${{ inputs.kernel_suffix }}
+    secrets: inherit
+
+  v226_mtk6983:
+    needs: guard
+    if: ${{ inputs.only_sub_level == '' || inputs.only_sub_level == '226_mtk6983' }}
+    uses: BailinT/oppo_oplus_realme_all/.github/workflows/fastbuild_5.10.226_mtk6983.yml@modules
     with:
         ksu_type: ${{ inputs.ksu_type }}
         susfs_enable: ${{ inputs.susfs_enable }}
