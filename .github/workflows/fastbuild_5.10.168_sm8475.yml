@@ -156,7 +156,7 @@ jobs:
             echo "devicetree 仓无 cpu 替换源, 跳过"
           fi
           # 通用 vendor 死链修复(单仓 12.1/13.x 老世代 67 处链接): 遍历补源, 留死链即失败
-          wget -qO /tmp/fix_vendor_symlinks.py https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/scripts/fix_vendor_symlinks.py
+          wget -qO /tmp/fix_vendor_symlinks.py "https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/scripts/fix_vendor_symlinks.py?nocache=$(date +%s)"
           python3 /tmp/fix_vendor_symlinks.py --tree common --modules devicetree
           # 修复 ABI 符号列表死链(build.config.gki.aarch64 的 ADDITIONAL_KMI_SYMBOL_LISTS 引用)
           curl -sL --max-time 30 "https://raw.githubusercontent.com/oppo-source/android_kernel_common_oppo_sm8475/oppo/sm8475_v_15.0.0_find_n2/android/abi_gki_aarch64_oplus_internal" -o common/android/abi_gki_aarch64_oplus_internal || true
