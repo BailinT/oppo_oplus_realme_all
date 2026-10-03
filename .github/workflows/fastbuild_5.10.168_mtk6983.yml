@@ -315,6 +315,20 @@ jobs:
               sed -i 's|end = VMA_PAD_START(vma);|end = vma->vm_end;|' fs/proc/task_mmu.c
               echo "已修复 task_mmu.c 的 VMA_PAD_START(改用 vma->vm_end)"
             fi
+            # u_14.0.0 老基符号移植(源=t_13.1, 与设备 14.0.0.201 原厂 CRC 逐位一致): 缺才打, 有则跳过
+            BPBASE="https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/other_patch/backport_symbols"
+            if ! grep -q "EXPORT_SYMBOL_GPL(get_avenrun)" kernel/sched/loadavg.c; then
+              wget -qO /tmp/bp_avenrun.patch "$BPBASE/get_avenrun.patch" && patch -p1 -F 3 < /tmp/bp_avenrun.patch
+              grep -q "EXPORT_SYMBOL_GPL(get_avenrun)" kernel/sched/loadavg.c || { echo "::error::get_avenrun 移植失败"; exit 1; }
+            fi
+            if ! grep -q "dynamic_debug_exec_queries" lib/dynamic_debug.c; then
+              wget -qO /tmp/bp_ddebug.patch "$BPBASE/dynamic_debug_exec_queries.patch" && patch -p1 -F 3 < /tmp/bp_ddebug.patch
+              grep -q "dynamic_debug_exec_queries" lib/dynamic_debug.c || { echo "::error::dynamic_debug_exec_queries 移植失败"; exit 1; }
+            fi
+            if ! grep -q "iov_iter_for_each_range" lib/iov_iter.c; then
+              wget -qO /tmp/bp_iov.patch "$BPBASE/iov_iter_for_each_range.patch" && patch -p1 -F 3 < /tmp/bp_iov.patch
+              grep -q "iov_iter_for_each_range" lib/iov_iter.c || { echo "::error::iov_iter_for_each_range 移植失败"; exit 1; }
+            fi
             cd ..
           else
             echo "已选择无内置KernelSU模式，跳过susfs配置..."
