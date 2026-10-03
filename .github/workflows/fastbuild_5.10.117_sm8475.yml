@@ -118,13 +118,13 @@ jobs:
           echo "正在克隆源码仓库..."
           aria2c -s16 -x16 -k1M https://github.com/OnePlusOSS/android_kernel_oneplus_sm8475/archive/refs/heads/oneplus_sm8475_t_13.0_oneplus_11R_5G.zip -o common.zip && 
           unzip -q common.zip && 
-          mv "android_kernel_oneplus_sm8475-oneplus-sm8475_t_13.0.0_ace_pro" common &&
+          mv "android_kernel_oneplus_sm8475-oneplus_sm8475_t_13.0_oneplus_11R_5G" common &&
           rm -rf common.zip &
           
           echo "正在克隆设备树仓库(用于修复官方common仓的死链)..."
           aria2c -s16 -x16 -k1M https://github.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8475/archive/refs/heads/oneplus_sm8475_t_13.0_oneplus_11R_5G.zip -o devicetree.zip &&
           unzip -q devicetree.zip &&
-          mv "android_kernel_modules_and_devicetree_oneplus_sm8475-oneplus-sm8475_t_13.0.0_ace_pro" devicetree &&
+          mv "android_kernel_modules_and_devicetree_oneplus_sm8475-oneplus_sm8475_t_13.0_oneplus_11R_5G" devicetree &&
           rm -rf devicetree.zip &
           
           echo "正在克隆llvm-Clang20工具链..." &&
