@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-"""通用 vendor 死链修复器: 遍历内核树内指向 vendor/ 的悬空符号链接, 从 modules 仓补源。
+"""通用 vendor 死链修复器 v2: 遍历内核树内悬空符号链接, 从 modules 仓补源。
 用法: python3 fix_vendor_symlinks.py --tree common --modules modules
-背景(mt6983 实测): OEM 清单把 vendor/ 源码放在独立仓, 内核树里的链接形如
-  drivers/android/oplus_binder -> ../../../vendor/oplus/kernel/ipc
-这些相对路径按 OEM 构建布局(kernel 与 vendor 仓并列)才成立, 裸 make -C common 必死链。
-修法(对齐 209_mtk 死链替换): 取链接目标里 vendor/ 起的相对路径, 在 modules 仓找同名源,
-用真实目录/文件替换链接本体。逻辑已按 mt6983@13.1 的 25 处死链全量验证。
+v2 行为(按 sm8475 单仓 12.1 实测迭代):
+  - vendor/ 悬空链接 → modules 仓补源(目录/文件), 硬依赖必须补上;
+  - 树内非 vendor 死链(QC 老世代遗留, 如 dts/vendor、touchpanel 头链接):
+    * 若其目标最终落在已补源的目录内 → 第二遍扫描时自然自洽;
+    * 否则仅告警不阻断(209/226/236 生产包同款死链可正常编译);
+  - Documentation/ 装饰链接: 告警不阻断;
+  - 全部 vendor 硬依赖补不齐才 exit 1。
 """
 import os, sys, shutil
 
@@ -20,44 +22,57 @@ def main():
             print(f'::error::{n} 目录不存在: {d} (cwd={os.getcwd()})')
             sys.exit(1)
     print(f'内核树: {tree}\nmodules 仓: {modules}')
-    fixed, unresolved, ok_links = [], [], 0
-    for root, dirs, files in os.walk(tree):
-        for name in dirs + files:
-            p = os.path.join(root, name)
-            if not os.path.islink(p):
-                continue
-            tgt = os.readlink(p)
-            # 1) 链接目标若在树内自洽, 不动
-            res = os.path.normpath(os.path.join(os.path.dirname(p), tgt))
-            if os.path.lexists(res):
-                ok_links += 1
-                continue
-            # 2) 死链且目标含 vendor/: 按 vendor/ 起的路径到 modules 仓找源
-            if 'vendor/' in tgt:
-                rel = tgt[tgt.index('vendor/'):]
-                src = os.path.join(modules, rel)
-                if os.path.isdir(src) and not os.path.islink(src):
-                    os.unlink(p)
-                    os.makedirs(os.path.dirname(p), exist_ok=True)
-                    shutil.copytree(src, p, symlinks=True)
-                    fixed.append(rel)
+    fixed, vendor_missing, internal_skip = [], [], 0
+    ok_links = 0
+    # 两遍: 第一遍补 vendor 源, 第二遍让树内链接指向新补的目录
+    for pass_no in (1, 2):
+        fixed_this = 0
+        for root, dirs, files in os.walk(tree):
+            for name in dirs + files:
+                p = os.path.join(root, name)
+                if not os.path.islink(p):
                     continue
-                if os.path.isfile(src):
-                    os.unlink(p)
-                    shutil.copyfile(src, p)
-                    fixed.append(rel)
+                tgt = os.readlink(p)
+                res = os.path.normpath(os.path.join(os.path.dirname(p), tgt))
+                if os.path.lexists(res):
+                    if pass_no == 1:
+                        ok_links += 1
                     continue
-            if p.replace(os.sep, '/').startswith('Documentation/'):
-                print(f'  [skip-doc] {p} -> {tgt} (Documentation 树装饰, 构建不依赖)')
-                continue
-            unresolved.append((p, tgt))
-    print(f'自洽链接: {ok_links} | 已补源: {len(fixed)} | 仍死链: {len(unresolved)}')
+                if 'vendor/' in tgt:
+                    rel = tgt[tgt.index('vendor/'):].rstrip('/')
+                    src = os.path.join(modules, rel)
+                    if os.path.isdir(src) and not os.path.islink(src):
+                        os.unlink(p)
+                        os.makedirs(os.path.dirname(p), exist_ok=True)
+                        shutil.copytree(src, p, symlinks=True)
+                        fixed.append(rel)
+                        fixed_this += 1
+                        continue
+                    if os.path.isfile(src):
+                        os.unlink(p)
+                        shutil.copyfile(src, p)
+                        fixed.append(rel)
+                        fixed_this += 1
+                        continue
+                    if pass_no == 2:
+                        relp = p.replace(os.sep, '/')
+                        vendor_missing.append((relp, tgt))
+                else:
+                    # 树内非 vendor 死链: Documentation 装饰或老世代遗留
+                    if pass_no == 1:
+                        relp = p.replace(os.sep, '/')
+                        tag = 'skip-doc' if relp.startswith('Documentation/') else 'skip-internal'
+                        internal_skip += 1
+                        print(f'  [{tag}] {relp} -> {tgt}')
+        if pass_no == 1 and fixed_this == 0:
+            break  # 第一遍没补任何源, 第二遍不会改善
+    print(f'自洽链接: {ok_links} | 已补源: {len(fixed)} | vendor硬依赖缺失: {len(vendor_missing)} | 树内死链豁免: {internal_skip}')
     for rel in fixed:
         print(f'  [fixed] {rel}')
-    for p, tgt in unresolved:
-        print(f'  [STILL-DANGLING] {p} -> {tgt}')
-    if unresolved:
-        print(f'::error::仍有 {len(unresolved)} 个死链无法补源')
+    for p, tgt in vendor_missing:
+        print(f'  [VENDOR-MISSING] {p} -> {tgt}')
+    if vendor_missing:
+        print(f'::error::仍有 {len(vendor_missing)} 个 vendor 硬依赖死链无法补源')
         sys.exit(1)
     print('vendor 死链修复完成')
 
