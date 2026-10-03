@@ -323,7 +323,10 @@ jobs:
             fi
             # OEM 调试残渣: thermal_core.c 把 int 成员传给 dev_err(&tz->temperature)(clang12 不报, clang20 -Werror 报) -> 删该行
             if grep -q 'dev_err(&tz->temperature' drivers/thermal/thermal_core.c; then
-              sed -i '/dev_err(&tz->temperature/ {N;N;d}' drivers/thermal/thermal_core.c
+              sed -i '/dev_err(&tz->temperature/ {N;N;d}' drivers/thermal/thermal_core.c              # 同文件 kvzalloc/kvfree 无声明(缺 mm.h include, clang12 传递包含/clang20 严格) -> 补
+              grep -q '#include <linux/mm.h>' drivers/thermal/thermal_sysfs.c || sed -i 's|#include <linux/slab.h>|#include <linux/slab.h>
+#include <linux/mm.h>|' drivers/thermal/thermal_sysfs.c
+
               grep -q 'dev_err(&tz->temperature' drivers/thermal/thermal_core.c && { echo "::error::thermal_core 调试残渣清理失败"; exit 1; } || echo "已清理 thermal_core 调试残渣"
             fi
             cd ..
