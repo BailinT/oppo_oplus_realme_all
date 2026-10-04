@@ -4,7 +4,7 @@
 # only_sub_level 留空 = 全部; 填子版本号 = 只建该版本
 # 每个子版本独立出 AK3 包、独立 release, 与原单版本构建行为一致
 # ============================================================
-name: "内核构建 - Linux 5.10（21 个子版本: 66/110/110_mtk6983/149/149_mtk6983/168/168_mtk6983/168_sm8475/198/198_sm8475/209/209_mtk/226/226_mtk6983/236/236_mtk/236_mtk6983/81_sm8475/101_sm8475/117_sm8475/136_sm8475）"
+name: "内核构建 - Linux 5.10（27 个子版本: 66/66_sm8450/110/110_mtk6983/149/149_mtk6983/168/168_mtk6983/168_sm8475/198/198_sm8475/209/209_mtk/209_sm8450/226/226_mtk6983/226_sm8450/236/236_mtk/236_mtk6983/236_sm8450/81_sm8475/101_sm8450/101_sm8475/117_sm8475/136_sm8450/136_sm8475）"
 
 permissions:
   contents: write
@@ -519,6 +519,131 @@ jobs:
     needs: guard
     if: ${{ inputs.only_sub_level == '' || inputs.only_sub_level == '198_sm8475' }}
     uses: BailinT/oppo_oplus_realme_all/.github/workflows/fastbuild_5.10.198_sm8475.yml@modules
+    with:
+        ksu_type: ${{ inputs.ksu_type }}
+        susfs_enable: ${{ inputs.susfs_enable }}
+        kpm_enable: ${{ inputs.kpm_enable }}
+        lz4_enable: ${{ inputs.lz4_enable }}
+        lz4kd_enable: ${{ inputs.lz4kd_enable }}
+        bbr_enable: ${{ inputs.bbr_enable }}
+        better_net: ${{ inputs.better_net }}
+        ssg_enable: ${{ inputs.ssg_enable }}
+        rekernel_enable: ${{ inputs.rekernel_enable }}
+        baseband_guard: ${{ inputs.baseband_guard }}
+        ccache_update: ${{ inputs.ccache_update }}
+        ccache_debug: ${{ inputs.ccache_debug }}
+        kernel_suffix: ${{ inputs.kernel_suffix }}
+    secrets: inherit
+
+  v66_sm8450:
+    needs: guard
+    if: ${{ inputs.only_sub_level == '' || inputs.only_sub_level == '66_sm8450' }}
+    uses: BailinT/oppo_oplus_realme_all/.github/workflows/fastbuild_5.10.66_sm8450.yml@modules
+    with:
+        ksu_type: ${{ inputs.ksu_type }}
+        susfs_enable: ${{ inputs.susfs_enable }}
+        kpm_enable: ${{ inputs.kpm_enable }}
+        lz4_enable: ${{ inputs.lz4_enable }}
+        lz4kd_enable: ${{ inputs.lz4kd_enable }}
+        bbr_enable: ${{ inputs.bbr_enable }}
+        better_net: ${{ inputs.better_net }}
+        ssg_enable: ${{ inputs.ssg_enable }}
+        rekernel_enable: ${{ inputs.rekernel_enable }}
+        baseband_guard: ${{ inputs.baseband_guard }}
+        ccache_update: ${{ inputs.ccache_update }}
+        ccache_debug: ${{ inputs.ccache_debug }}
+        kernel_suffix: ${{ inputs.kernel_suffix }}
+    secrets: inherit
+
+
+  v101_sm8450:
+    needs: guard
+    if: ${{ inputs.only_sub_level == '' || inputs.only_sub_level == '101_sm8450' }}
+    uses: BailinT/oppo_oplus_realme_all/.github/workflows/fastbuild_5.10.101_sm8450.yml@modules
+    with:
+        ksu_type: ${{ inputs.ksu_type }}
+        susfs_enable: ${{ inputs.susfs_enable }}
+        kpm_enable: ${{ inputs.kpm_enable }}
+        lz4_enable: ${{ inputs.lz4_enable }}
+        lz4kd_enable: ${{ inputs.lz4kd_enable }}
+        bbr_enable: ${{ inputs.bbr_enable }}
+        better_net: ${{ inputs.better_net }}
+        ssg_enable: ${{ inputs.ssg_enable }}
+        rekernel_enable: ${{ inputs.rekernel_enable }}
+        baseband_guard: ${{ inputs.baseband_guard }}
+        ccache_update: ${{ inputs.ccache_update }}
+        ccache_debug: ${{ inputs.ccache_debug }}
+        kernel_suffix: ${{ inputs.kernel_suffix }}
+    secrets: inherit
+
+
+  v136_sm8450:
+    needs: guard
+    if: ${{ inputs.only_sub_level == '' || inputs.only_sub_level == '136_sm8450' }}
+    uses: BailinT/oppo_oplus_realme_all/.github/workflows/fastbuild_5.10.136_sm8450.yml@modules
+    with:
+        ksu_type: ${{ inputs.ksu_type }}
+        susfs_enable: ${{ inputs.susfs_enable }}
+        kpm_enable: ${{ inputs.kpm_enable }}
+        lz4_enable: ${{ inputs.lz4_enable }}
+        lz4kd_enable: ${{ inputs.lz4kd_enable }}
+        bbr_enable: ${{ inputs.bbr_enable }}
+        better_net: ${{ inputs.better_net }}
+        ssg_enable: ${{ inputs.ssg_enable }}
+        rekernel_enable: ${{ inputs.rekernel_enable }}
+        baseband_guard: ${{ inputs.baseband_guard }}
+        ccache_update: ${{ inputs.ccache_update }}
+        ccache_debug: ${{ inputs.ccache_debug }}
+        kernel_suffix: ${{ inputs.kernel_suffix }}
+    secrets: inherit
+
+
+  v209_sm8450:
+    needs: guard
+    if: ${{ inputs.only_sub_level == '' || inputs.only_sub_level == '209_sm8450' }}
+    uses: BailinT/oppo_oplus_realme_all/.github/workflows/fastbuild_5.10.209_sm8450.yml@modules
+    with:
+        ksu_type: ${{ inputs.ksu_type }}
+        susfs_enable: ${{ inputs.susfs_enable }}
+        kpm_enable: ${{ inputs.kpm_enable }}
+        lz4_enable: ${{ inputs.lz4_enable }}
+        lz4kd_enable: ${{ inputs.lz4kd_enable }}
+        bbr_enable: ${{ inputs.bbr_enable }}
+        better_net: ${{ inputs.better_net }}
+        ssg_enable: ${{ inputs.ssg_enable }}
+        rekernel_enable: ${{ inputs.rekernel_enable }}
+        baseband_guard: ${{ inputs.baseband_guard }}
+        ccache_update: ${{ inputs.ccache_update }}
+        ccache_debug: ${{ inputs.ccache_debug }}
+        kernel_suffix: ${{ inputs.kernel_suffix }}
+    secrets: inherit
+
+
+  v226_sm8450:
+    needs: guard
+    if: ${{ inputs.only_sub_level == '' || inputs.only_sub_level == '226_sm8450' }}
+    uses: BailinT/oppo_oplus_realme_all/.github/workflows/fastbuild_5.10.226_sm8450.yml@modules
+    with:
+        ksu_type: ${{ inputs.ksu_type }}
+        susfs_enable: ${{ inputs.susfs_enable }}
+        kpm_enable: ${{ inputs.kpm_enable }}
+        lz4_enable: ${{ inputs.lz4_enable }}
+        lz4kd_enable: ${{ inputs.lz4kd_enable }}
+        bbr_enable: ${{ inputs.bbr_enable }}
+        better_net: ${{ inputs.better_net }}
+        ssg_enable: ${{ inputs.ssg_enable }}
+        rekernel_enable: ${{ inputs.rekernel_enable }}
+        baseband_guard: ${{ inputs.baseband_guard }}
+        ccache_update: ${{ inputs.ccache_update }}
+        ccache_debug: ${{ inputs.ccache_debug }}
+        kernel_suffix: ${{ inputs.kernel_suffix }}
+    secrets: inherit
+
+
+  v236_sm8450:
+    needs: guard
+    if: ${{ inputs.only_sub_level == '' || inputs.only_sub_level == '236_sm8450' }}
+    uses: BailinT/oppo_oplus_realme_all/.github/workflows/fastbuild_5.10.236_sm8450.yml@modules
     with:
         ksu_type: ${{ inputs.ksu_type }}
         susfs_enable: ${{ inputs.susfs_enable }}
