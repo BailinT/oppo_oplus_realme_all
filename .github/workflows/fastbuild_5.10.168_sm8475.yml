@@ -339,6 +339,9 @@ jobs:
                     if grep -q 'scan_adjusted' mm/vmscan.c && ! grep -q 'bool scan_adjusted;' mm/vmscan.c; then
                       wget -qO /tmp/fix_vmscan.py "https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/scripts/fix_vmscan_scan_adjusted.py?nocache=$(date +%s)"
                       python3 /tmp/fix_vmscan.py
+                      echo "=== vmscan 诊断 ==="
+                      grep -n 'proportional_reclaim' mm/vmscan.c || echo "!! proportional_reclaim 缺失"
+                      grep -n 'scan_adjusted' mm/vmscan.c | head -5 || true
                       grep -q 'bool scan_adjusted;' mm/vmscan.c || { echo '::error::vmscan scan_adjusted 声明补丁失败'; exit 1; }
                     fi
                 fi
