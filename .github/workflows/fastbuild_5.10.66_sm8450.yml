@@ -1,16 +1,16 @@
 # ============================================================
-# 源: OnePlusOSS/android_kernel_common_oneplus_sm8450 @ oneplus/sm8450_u_14.0.0_oneplus_11r_5g (实测 Makefile = 5.10.209)
+# 源: OnePlusOSS/android_kernel_common_oneplus_sm8450 @ oneplus/sm8450_s_12.1_10_pro (实测 Makefile = 5.10.66)
 # 首跑按「同芯片最新分支」; 其他芯片同 x 变体后续按需扩展
 # ============================================================
-name: 5.10.101_sm8450 欧加真OKI内核快速构建(sm8450)
+name: 5.10.66_sm8450 欧加真OKI内核快速构建(sm8450)
 
 env:
   TZ: Asia/Shanghai
   ANDROID_VERSION: 'android12'
   KERNEL_VERSION: '5.10'
-  SUB_VERSION: '101_sm8450'
+  SUB_VERSION: '66_sm8450'
   KERNEL_NAME: 'android12-9-00001-g5.10.66'
-  CCACHE_KEY: ccache-ecsv4-5.10.101_sm8450
+  CCACHE_KEY: ccache-ecsv4-5.10.66_sm8450
 
 on:
   workflow_call:
@@ -169,6 +169,13 @@ jobs:
             sed -i 's/ -dirty//g' "$f"
             sed -i '$i res=$(echo "$res" | sed '\''s/-dirty//g'\'')' "$f"
           done
+          # 补导出 QC vendor 模块依赖但 GKI 未导出的符号（原厂 sm8450·66 kcrc4 对比实测缺 2 个: wq_worker_comm / __stack_chk_guard）
+          grep -qE "EXPORT_SYMBOL(_GPL)?[(]wq_worker_comm[)]" common/kernel/workqueue.c || { echo "" >> common/kernel/workqueue.c; echo "EXPORT_SYMBOL(wq_worker_comm);" >> common/kernel/workqueue.c; }
+          if ! grep -rqs "unsigned long __stack_chk_guard" common/kernel common/arch/arm64/kernel; then
+            echo "" >> common/kernel/workqueue.c
+            echo "unsigned long __stack_chk_guard = 0;" >> common/kernel/workqueue.c
+            echo "EXPORT_SYMBOL(__stack_chk_guard);" >> common/kernel/workqueue.c
+          fi
 
       - name: 配置ccache目录
         run: |
