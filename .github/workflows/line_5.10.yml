@@ -20,12 +20,12 @@ on:
         type: string
         default: ''
       ksu_type:
-        description: "KernelSU分支(ReSukiSU/SukiSU Ultra/KernelSU Next/KSU(原版)/无内置KSU,默认ReSukiSU)"
+        description: "KernelSU分支(BakaSU/SukiSU Ultra/KernelSU Next/KSU(原版)/无内置KSU,默认BakaSU)"
         required: true
         type: choice
-        default: "resukisu"
+        default: "bakasu"
         options:
-          - "resukisu"
+          - "bakasu"
           - "sukisu"
           - "ksunext"
           - "ksu"
