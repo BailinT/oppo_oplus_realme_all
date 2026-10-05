@@ -14,6 +14,11 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
+      auto_release:
+        description: "是否发布 Release（默认不发布，产物留在 Actions Artifacts）"
+        required: false
+        type: boolean
+        default: false
       only_sub_level:
         description: '只构建指定子版本(留空=全部; 可填 66/110/149/168/198/209/209_mtk/226/236)'
         required: false
@@ -136,6 +141,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v110:
     needs: guard
@@ -155,6 +161,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v149:
     needs: guard
@@ -174,6 +181,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v168:
     needs: guard
@@ -193,6 +201,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v198:
     needs: guard
@@ -212,6 +221,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v209:
     needs: guard
@@ -231,6 +241,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v209_mtk:
     needs: guard
@@ -250,6 +261,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v226:
     needs: guard
@@ -269,6 +281,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v236:
     needs: guard
@@ -288,6 +301,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
   v236_mtk:
@@ -308,6 +322,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
   v149_mtk6983:
@@ -328,6 +343,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
   v110_mtk6983:
@@ -348,6 +364,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
   v168_mtk6983:
@@ -368,6 +385,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
   v226_mtk6983:
@@ -388,6 +406,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
   v236_mtk6983:
@@ -408,6 +427,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
   v81_sm8475:
@@ -428,6 +448,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
 
@@ -449,6 +470,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
 
@@ -470,6 +492,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
 
@@ -491,6 +514,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
 
@@ -512,6 +536,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
 
@@ -533,6 +558,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
   v66_sm8450:
@@ -553,6 +579,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
 
@@ -574,6 +601,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
 
@@ -595,6 +623,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
 
@@ -616,6 +645,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
 
@@ -637,6 +667,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
 
@@ -658,5 +689,6 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 

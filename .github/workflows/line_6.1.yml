@@ -14,6 +14,11 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
+      auto_release:
+        description: "是否发布 Release（默认不发布，产物留在 Actions Artifacts）"
+        required: false
+        type: boolean
+        default: false
       only_sub_level:
         description: '只构建指定子版本(留空=全部; 可填 57/75/115/118/128/134/141/157)'
         required: false
@@ -151,6 +156,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v75:
     needs: guard
@@ -171,6 +177,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v115:
     needs: guard
@@ -191,6 +198,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v118:
     needs: guard
@@ -211,6 +219,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v128:
     needs: guard
@@ -231,6 +240,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v134:
     needs: guard
@@ -251,6 +261,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v141:
     needs: guard
@@ -272,6 +283,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
   v157:
     needs: guard
@@ -292,6 +304,7 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
 
   v128_mtk6897:
@@ -313,4 +326,5 @@ jobs:
         ccache_update: ${{ inputs.ccache_update }}
         ccache_debug: ${{ inputs.ccache_debug }}
         kernel_suffix: ${{ inputs.kernel_suffix }}
+        auto_release: ${{ inputs.auto_release || false }}
     secrets: inherit
