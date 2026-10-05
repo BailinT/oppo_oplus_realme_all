@@ -15,6 +15,11 @@ env:
 on:
   workflow_call:
     inputs:
+      auto_release:
+        description: "是否发布 Release（默认不发布，产物留在 Actions Artifacts）"
+        required: false
+        type: boolean
+        default: false
       ksu_type:
         description: 'KernelSU分支(BakaSU/SukiSU Ultra/KernelSU Next/KSU(原版)/无内置KSU,默认BakaSU)'
         required: true
@@ -770,6 +775,7 @@ jobs:
           archive: false
 
   release:
+    if: ${{ inputs.auto_release == true }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
