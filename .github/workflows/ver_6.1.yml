@@ -125,12 +125,12 @@ jobs:
       - uses: actions/checkout@v7
       - name: 校验 line 文件 uses 声明指向本仓 modules 分支
         run: |
-          total=$(grep -hE "^[[:space:]]*uses: [^ ]*fastbuild_" .github/workflows/line_*.yml | wc -l)
+          total=$(grep -hE "^[[:space:]]*uses: [^ ]*fastbuild_" .github/workflows/{line,ver,dev}_*.yml | wc -l)
           if [ "$total" -lt 1 ]; then
             echo "::error::line 文件中未找到任何模块 uses 声明"
             exit 1
           fi
-          bad=$(grep -hE "^[[:space:]]*uses: [^ ]*fastbuild_" .github/workflows/line_*.yml | grep -vE "^[[:space:]]*uses: ${GITHUB_REPOSITORY}/\.github/workflows/fastbuild_[A-Za-z0-9_.-]+\.yml@modules[[:space:]]*$" || true)
+          bad=$(grep -hE "^[[:space:]]*uses: [^ ]*fastbuild_" .github/workflows/{line,ver,dev}_*.yml | grep -vE "^[[:space:]]*uses: ${GITHUB_REPOSITORY}/\.github/workflows/fastbuild_[A-Za-z0-9_.-]+\.yml@modules[[:space:]]*$" || true)
           if [ -n "$bad" ]; then
             echo "::error::uses 声明不符合规范——必须指向 ${GITHUB_REPOSITORY} 的 modules 分支模块（复制 line 文件时勿忘改仓库名）："
             echo "$bad"
