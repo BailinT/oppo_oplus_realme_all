@@ -70,9 +70,8 @@ def main():
                             mk = os.path.join(parent, 'Makefile')
                             if os.path.isfile(mk):
                                 mk_src = open(mk, encoding='utf-8', errors='replace').read()
-                                mk_new = '
-'.join(('# disabled(unopensource vendor link): ' + ln) if (name + '/') in ln or ('/' + name) in ln else ln for ln in mk_src.split('
-'))
+                                mk_lines = mk_src.splitlines()
+                                mk_new = '\n'.join(('# disabled(unopensource vendor link): ' + ln) if (name + '/') in ln or ('/' + name) in ln else ln for ln in mk_lines)
                                 if mk_new != mk_src:
                                     open(mk, 'w', encoding='utf-8', newline='').write(mk_new)
                             print(f'  [DISABLED] {relp} -> {tgt} (驱动源不开源, 已删链接并注释 Makefile 引用)')
