@@ -342,12 +342,13 @@ jobs:
 
 
 
+            fi
             # 补源的 sensor devinfo 依赖私有符号(qcom_smem/get_project, 原厂在 vendor 侧) -> 关闭编入
             if [ -d drivers/soc/oplus/sensor ]; then
             grep -q "CONFIG_OPLUS_FEATURE_SENSOR_CFG" arch/arm64/configs/gki_defconfig || echo "# CONFIG_OPLUS_FEATURE_SENSOR_CFG is not set" >> arch/arm64/configs/gki_defconfig
             echo "已关闭 OPLUS_FEATURE_SENSOR_CFG(sensor devinfo 依赖 vendor 私有符号)"
             fi
-            fi
+
 
             if grep -q 'mmget_still_valid' drivers/android/binder_alloc.c 2>/dev/null; then
             sed -i 's|if (!mmget_still_valid(mm)) {|if (0) {|' drivers/android/binder_alloc.c
