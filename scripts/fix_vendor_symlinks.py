@@ -17,12 +17,14 @@ def main():
         return args[args.index(name) + 1] if name in args else default
     tree = os.path.abspath(opt('--tree', 'common'))
     modules = os.path.abspath(opt('--modules', 'modules'))
+    allow_missing = [x.strip() for x in opt('--allow-missing', '').split(',') if x.strip()]
     for d, n in ((tree, 'tree'), (modules, 'modules')):
         if not os.path.isdir(d):
             print(f'::error::{n} 目录不存在: {d} (cwd={os.getcwd()})')
             sys.exit(1)
     print(f'内核树: {tree}\nmodules 仓: {modules}')
     fixed, vendor_missing, internal_skip = [], [], 0
+    disabled = []
     ok_links = 0
     # 两遍: 第一遍补 vendor 源, 第二遍让树内链接指向新补的目录
     for pass_no in (1, 2):
@@ -61,7 +63,20 @@ def main():
                         continue
                     if pass_no == 2:
                         relp = p.replace(os.sep, '/')
-                        vendor_missing.append((relp, tgt))
+                        if any(relp.endswith(s) or (s + '/') in relp + '/' for s in allow_missing):
+                            os.unlink(p)
+                            parent = os.path.dirname(p)
+                            name = os.path.basename(p)
+                            mk = os.path.join(parent, 'Makefile')
+                            if os.path.isfile(mk):
+                                mk_src = open(mk, encoding='utf-8', errors='replace').read()
+                                mk_new = N.join(('# disabled(unopensource vendor link): ' + ln) if (name + '/') in ln or ('/' + name) in ln else ln for ln in mk_src.split(N))
+                                if mk_new != mk_src:
+                                    open(mk, 'w', encoding='utf-8', newline='').write(mk_new)
+                            print(f'  [DISABLED] {relp} -> {tgt} (驱动源不开源, 已删链接并注释 Makefile 引用)')
+                            disabled.append(relp)
+                        else:
+                            vendor_missing.append((relp, tgt))
                 else:
                     # 树内非 vendor 死链: Documentation 装饰或老世代遗留
                     if pass_no == 1:
@@ -71,7 +86,7 @@ def main():
                         print(f'  [{tag}] {relp} -> {tgt}')
         if pass_no == 1 and fixed_this == 0:
             break  # 第一遍没补任何源, 第二遍不会改善
-    print(f'自洽链接: {ok_links} | 已补源: {len(fixed)} | vendor硬依赖缺失: {len(vendor_missing)} | 树内死链豁免: {internal_skip}')
+    print(f'自洽链接: {ok_links} | 已补源: {len(fixed)} | 已禁用不可补源: {len(disabled)} | vendor硬依赖缺失: {len(vendor_missing)} | 树内死链豁免: {internal_skip}')
     for rel in fixed:
         print(f'  [fixed] {rel}')
     for p, tgt in vendor_missing:
