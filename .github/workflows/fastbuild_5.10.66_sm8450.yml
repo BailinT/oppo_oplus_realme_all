@@ -327,28 +327,28 @@ jobs:
               grep -q 'dev_err(&tz->temperature' drivers/thermal/thermal_core.c && { echo "::error::thermal_core 调试残渣清理失败"; exit 1; } || echo "已清理 thermal_core 调试残渣"
                 # thermal_sysfs.c 的 kvzalloc/kvfree 隐式声明(缺 mm.h include, 原厂 clang12 宽容) -> 补 include
               # 老基树 binder_alloc.c 调 mmget_still_valid(5.10.81 OEM 树无此函数) -> 恒假替换(语义=mm 永远有效)
-              if grep -q 'mmget_still_valid' drivers/android/binder_alloc.c 2>/dev/null; then
-                sed -i 's|if (!mmget_still_valid(mm)) {|if (0) {|' drivers/android/binder_alloc.c
-                grep -q 'mmget_still_valid' drivers/android/binder_alloc.c && { echo "::error::binder_alloc mmget_still_valid 处理失败"; exit 1; } || echo "已处理 binder_alloc mmget_still_valid"
-              fi
 
-                if grep -q 'kvzalloc' drivers/thermal/thermal_sysfs.c && ! grep -q '#include <linux/mm.h>' drivers/thermal/thermal_sysfs.c; then
-                  sed -i '/#include <linux\/slab.h>/a #include <linux\/mm.h>' drivers/thermal/thermal_sysfs.c
-                  grep -q '#include <linux/mm.h>' drivers/thermal/thermal_sysfs.c || { echo '::error::thermal_sysfs mm.h 补丁失败'; exit 1; }
-                    # OEM 同步失误: ace 系树 mm/vmscan.c 缺 bool scan_adjusted 声明(11r 树有) -> 脚本条件补
-                    if grep -q 'scan_adjusted' mm/vmscan.c && ! grep -q 'bool scan_adjusted;' mm/vmscan.c; then
-                      wget -qO /tmp/fix_vmscan.py "https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/scripts/fix_vmscan_scan_adjusted.py?nocache=$(date +%s)"
-                      python3 /tmp/fix_vmscan.py
-                      grep -q 'bool scan_adjusted;' mm/vmscan.c || { echo '::error::vmscan scan_adjusted 声明补丁失败'; exit 1; }
-                    fi
-              # OEM 同步失误: ace 系树 mm/vmscan.c 缺 bool scan_adjusted 声明(11r 树有) -> 条件补
-              fi
 
               # 补源的 sensor devinfo 依赖私有符号(qcom_smem/get_project, 原厂在 vendor 侧) -> 关闭编入
               if [ -d drivers/soc/oplus/sensor ]; then
                 grep -q "CONFIG_OPLUS_FEATURE_SENSOR_CFG" arch/arm64/configs/gki_defconfig || echo "# CONFIG_OPLUS_FEATURE_SENSOR_CFG is not set" >> arch/arm64/configs/gki_defconfig
                 echo "已关闭 OPLUS_FEATURE_SENSOR_CFG(sensor devinfo 依赖 vendor 私有符号)"
               fi
+            fi
+            if grep -q 'mmget_still_valid' drivers/android/binder_alloc.c 2>/dev/null; then
+            sed -i 's|if (!mmget_still_valid(mm)) {|if (0) {|' drivers/android/binder_alloc.c
+            grep -q 'mmget_still_valid' drivers/android/binder_alloc.c && { echo "::error::binder_alloc mmget_still_valid 处理失败"; exit 1; } || echo "已处理 binder_alloc mmget_still_valid"
+            fi
+            if grep -q 'kvzalloc' drivers/thermal/thermal_sysfs.c && ! grep -q '#include <linux/mm.h>' drivers/thermal/thermal_sysfs.c; then
+            sed -i '/#include <linux\/slab.h>/a #include <linux\/mm.h>' drivers/thermal/thermal_sysfs.c
+            grep -q '#include <linux/mm.h>' drivers/thermal/thermal_sysfs.c || { echo '::error::thermal_sysfs mm.h 补丁失败'; exit 1; }
+            # OEM 同步失误: ace 系树 mm/vmscan.c 缺 bool scan_adjusted 声明(11r 树有) -> 脚本条件补
+            if grep -q 'scan_adjusted' mm/vmscan.c && ! grep -q 'bool scan_adjusted;' mm/vmscan.c; then
+            wget -qO /tmp/fix_vmscan.py "https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/scripts/fix_vmscan_scan_adjusted.py?nocache=$(date +%s)"
+            python3 /tmp/fix_vmscan.py
+            grep -q 'bool scan_adjusted;' mm/vmscan.c || { echo '::error::vmscan scan_adjusted 声明补丁失败'; exit 1; }
+            fi
+            # OEM 同步失误: ace 系树 mm/vmscan.c 缺 bool scan_adjusted 声明(11r 树有) -> 条件补
             fi
             cd ..
           else
