@@ -341,6 +341,7 @@ jobs:
               # 老基树 binder_alloc.c 调 mmget_still_valid(5.10.81 OEM 树无此函数) -> 恒假替换(语义=mm 永远有效)
 
 
+
             # 补源的 sensor devinfo 依赖私有符号(qcom_smem/get_project, 原厂在 vendor 侧) -> 关闭编入
             if [ -d drivers/soc/oplus/sensor ]; then
             grep -q "CONFIG_OPLUS_FEATURE_SENSOR_CFG" arch/arm64/configs/gki_defconfig || echo "# CONFIG_OPLUS_FEATURE_SENSOR_CFG is not set" >> arch/arm64/configs/gki_defconfig
